@@ -48,6 +48,34 @@ display:inline-block;
 
 <body>
 
+  <nav>
+  <a href="#inicio">Inicio</a> |
+  <a href="#provincias">Provincias de República Dominicana</a> |
+  <a href="#resultados">Resultados</a>
+</nav>
+
+<section id="inicio">
+  <h1>Aprobación de proyectos</h1>
+  <p>Sistema de votación</p>
+</section>
+
+<section id="provincias">
+  <h2>Provincias</h2>
+
+  <button onclick="votar('Santo Domingo','si')">Santo Domingo - SI</button>
+  <button onclick="votar('Santo Domingo','no')">Santo Domingo - NO</button>
+
+  <button onclick="votar('Santiago','si')">Santiago - SI</button>
+  <button onclick="votar('Santiago','no')">Santiago - NO</button>
+
+</section>
+
+<section id="resultados">
+  <h2>Resultados</h2>
+  <button onclick="mostrarResultados()">Ver votos</button>
+  <div id="verResultados"></div>
+</section>
+  
 <header>
 <h1>Aprobación de proyectos</h1>
 <h3>Sistema de votación</h3>
