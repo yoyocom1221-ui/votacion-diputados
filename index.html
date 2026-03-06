@@ -4,67 +4,113 @@
 <meta charset="UTF-8">
 <title>Aprobación de proyectos</title>
 <style>
-body{
-    font-family: Arial;
-    text-align: center;
-    background: #f4f4f4;
-    margin: 0;
-    padding: 0;
-}
-
-nav{
-    background: #002D62;
-    padding: 15px;
-}
-
-nav a{
-    color: white;
-    margin: 10px;
-    text-decoration: none;
-    font-weight: bold;
-    font-size: 18px;
-}
-
-section{
-    margin: 50px;
-}
-
-/* Nuevo estilo para el título grande */
-h1{
-    font-size: 60px; /* Tamaño grande */
-    color: #002D62;
-    margin-bottom: 20px;
-}
-
-h2{
-    font-size: 30px;
-    color: #555;
-    margin-bottom: 30px;
-}
-
-img{
-    width: 300px;
-    margin: 20px;
-    border-radius: 10px;
-}
+body{font-family: Arial;text-align:center;background:#f4f4f4;margin:0;padding:0;}
+nav{background:#002D62;padding:15px;}
+nav a{color:white;margin:10px;text-decoration:none;font-weight:bold;font-size:18px;}
+section{margin:50px;}
+h1{font-size:60px;color:#002D62;margin-bottom:20px;}
+h2{font-size:30px;color:#555;margin-bottom:30px;}
+img{width:300px;margin:20px;border-radius:10px;}
+#loginBtn,#logoutBtn{padding:15px 30px;font-size:18px;cursor:pointer;margin:10px;}
 </style>
 </head>
 <body>
 
-<!-- Menú -->
 <nav>
   <a href="index.html">Inicio</a>
   <a href="votacion.html">Área de votación</a>
   <a href="resultados.html">Ver votos</a>
 </nav>
 
-<!-- Sección Inicio -->
-<section>
-<h1>Bienvenidos distinguidos Diputados</h1>
+<section id="inicio">
+<h1 id="titulo">Bienvenidos distinguidos Diputados</h1>
 <h2>Sistema de votación</h2>
 <img src="https://tse4.mm.bing.net/th/id/OIP.1sPFPR1HWOUNZR8SWlwDlgHaDF?rs=1&pid=ImgDetMain&o=7&rm=3">
-<p>Votación por provincias de la República Dominicana</p>
+<p id="mensaje">Votación por provincias de la República Dominicana</p>
+
+<button id="loginBtn">Iniciar sesión con Google</button>
+<button id="logoutBtn" style="display:none;">Cerrar sesión</button>
+
+<div id="nombreUsuarioDiv" style="display:none;">
+  <input type="text" id="nombreUsuario" placeholder="Ingresa tu nombre de usuario">
+  <button id="guardarNombre">Guardar</button>
+</div>
 </section>
+
+<script type="module">
+// Firebase
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import { getDatabase, ref, set, get } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
+import { getAuth, GoogleAuthProvider, signInWithPopup, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+
+// Config de Firebase (usa la tuya)
+const firebaseConfig = {
+  apiKey: "TU_API_KEY",
+  authDomain: "votacion-diputados.firebaseapp.com",
+  databaseURL: "https://votacion-diputados-default-rtdb.firebaseio.com",
+  projectId: "votacion-diputados",
+  storageBucket: "votacion-diputados.firebasestorage.app",
+  messagingSenderId: "56652176884",
+  appId: "1:56652176884:web:2a50622dea3dc814a72da1"
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getDatabase(app);
+const auth = getAuth(app);
+const provider = new GoogleAuthProvider();
+
+const loginBtn = document.getElementById("loginBtn");
+const logoutBtn = document.getElementById("logoutBtn");
+const nombreDiv = document.getElementById("nombreUsuarioDiv");
+const nombreInput = document.getElementById("nombreUsuario");
+const guardarNombreBtn = document.getElementById("guardarNombre");
+const titulo = document.getElementById("titulo");
+
+// Iniciar sesión
+loginBtn.addEventListener("click", () => {
+  signInWithPopup(auth, provider);
+});
+
+// Cerrar sesión
+logoutBtn.addEventListener("click", () => {
+  signOut(auth);
+});
+
+// Detectar cambios de sesión
+onAuthStateChanged(auth, async (user) => {
+  if(user){
+    loginBtn.style.display = "none";
+    logoutBtn.style.display = "inline-block";
+
+    const userRef = ref(db, "usuarios/" + user.uid);
+    const snapshot = await get(userRef);
+    if(snapshot.exists()){
+      const datos = snapshot.val();
+      titulo.innerText = "Bienvenido " + datos.nombre;
+    }else{
+      nombreDiv.style.display = "block";
+    }
+  }else{
+    loginBtn.style.display = "inline-block";
+    logoutBtn.style.display = "none";
+    nombreDiv.style.display = "none";
+    titulo.innerText = "Bienvenidos distinguidos Diputados";
+  }
+});
+
+// Guardar nombre de usuario
+guardarNombreBtn.addEventListener("click", async () => {
+  const user = auth.currentUser;
+  if(user && nombreInput.value.trim() !== ""){
+    await set(ref(db, "usuarios/" + user.uid), {
+      nombre: nombreInput.value.trim(),
+      email: user.email
+    });
+    titulo.innerText = "Bienvenido " + nombreInput.value.trim();
+    nombreDiv.style.display = "none";
+  }
+});
+</script>
 
 </body>
 </html>
