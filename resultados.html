@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<title>Resultados</title>
+<style>
+body{font-family: Arial;text-align:center;background:#f4f4f4;}
+nav{background:#002D62;padding:15px;}
+nav a{color:white;margin:10px;text-decoration:none;font-weight:bold;}
+section{margin:30px;}
+button{padding:10px 20px;margin:5px;font-size:16px;cursor:pointer;}
+.provincia{background:white;margin:10px;padding:10px;border-radius:8px;}
+</style>
+</head>
+<body>
+
+<!-- Menú -->
+<nav>
+  <a href="index.html">Inicio</a>
+  <a href="votacion.html">Área de votación</a>
+  <a href="resultados.html">Ver votos</a>
+</nav>
+
+<!-- Sección Resultados -->
+<section>
+<h2>Resultados</h2>
+<button onclick="mostrarResultados()">Actualizar resultados</button>
+<button onclick="borrarResultados()">Borrar resultados</button>
+<div id="verResultados"></div>
+</section>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import { getDatabase, ref, onValue, remove } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyAcsuZ-oZCrQ81XNF-945h4d2msKtBN8uM",
+  authDomain: "votacion-diputados.firebaseapp.com",
+  databaseURL: "https://votacion-diputados-default-rtdb.firebaseio.com",
+  projectId: "votacion-diputados",
+  storageBucket: "votacion-diputados.firebasestorage.app",
+  messagingSenderId: "56652176884",
+  appId: "1:56652176884:web:2a50622dea3dc814a72da1"
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getDatabase(app);
+
+const provincias = ["La Vega","Puerto Plata","San Cristóbal","San Juan","Santiago","Santo Domingo Este"];
+
+window.borrarResultados = function(){
+  if(confirm("¿Seguro que quieres borrar todos los votos?")){
+    const votosRef = ref(db,"votos");
+    remove(votosRef);
+    alert("Todos los votos fueron borrados");
+  }
+}
+
+window.mostrarResultados = function(){
+  const cont = document.getElementById("verResultados");
+  cont.innerHTML="";
+  provincias.forEach(p=>{
+    const votoRef = ref(db,'votos/'+p);
+    onValue(votoRef,(snapshot)=>{
+      let datos = snapshot.val() || {si:0,no:0};
+      let div = document.getElementById("res_"+p);
+      if(!div){ div=document.createElement("div"); div.id="res_"+p; div.className="provincia"; cont.appendChild(div);}
+      div.innerHTML=`<h3>${p}</h3><p>SI: ${datos.si}</p><p>NO: ${datos.no}</p>`;
+    });
+  });
+}
+</script>
+
+</body>
+</html>
