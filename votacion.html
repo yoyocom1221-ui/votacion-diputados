@@ -4,9 +4,9 @@
 <meta charset="UTF-8">
 <title>Área de votación</title>
 <style>
-body{font-family: Arial;text-align:center;background:#f4f4f4;}
+body{font-family: Arial;text-align:center;background:#f4f4f4;margin:0;padding:0;}
 nav{background:#002D62;padding:15px;}
-nav a{color:white;margin:10px;text-decoration:none;font-weight:bold;}
+nav a{color:white;margin:10px;text-decoration:none;font-weight:bold;font-size:18px;}
 section{margin:30px;}
 button{padding:10px 20px;margin:5px;font-size:16px;cursor:pointer;}
 .provincia{background:white;margin:10px;padding:10px;border-radius:8px;}
@@ -14,14 +14,12 @@ button{padding:10px 20px;margin:5px;font-size:16px;cursor:pointer;}
 </head>
 <body>
 
-<!-- Menú -->
 <nav>
   <a href="index.html">Inicio</a>
   <a href="votacion.html">Área de votación</a>
   <a href="resultados.html">Ver votos</a>
 </nav>
 
-<!-- Sección Votación -->
 <section>
 <h2>Provincias de República Dominicana</h2>
 <div id="listaProvincias"></div>
@@ -30,9 +28,11 @@ button{padding:10px 20px;margin:5px;font-size:16px;cursor:pointer;}
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
 import { getDatabase, ref, set, get } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
+import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 
+// Firebase config
 const firebaseConfig = {
-  apiKey: "AIzaSyAcsuZ-oZCrQ81XNF-945h4d2msKtBN8uM",
+  apiKey: "TU_API_KEY",
   authDomain: "votacion-diputados.firebaseapp.com",
   databaseURL: "https://votacion-diputados-default-rtdb.firebaseio.com",
   projectId: "votacion-diputados",
@@ -43,6 +43,12 @@ const firebaseConfig = {
 
 const app = initializeApp(firebaseConfig);
 const db = getDatabase(app);
+const auth = getAuth(app);
+
+// ⚠️ Verificar sesión
+onAuthStateChanged(auth, (user) => {
+  if(!user) window.location.href = "index.html";
+});
 
 const provincias = ["La Vega","Puerto Plata","San Cristóbal","San Juan","Santiago","Santo Domingo Este"];
 const cont = document.getElementById("listaProvincias");
@@ -50,9 +56,11 @@ const cont = document.getElementById("listaProvincias");
 provincias.forEach(p=>{
   const div=document.createElement("div");
   div.className="provincia";
-  div.innerHTML=`<h3>${p}</h3>
-                 <button onclick="votar('${p}','si')">SI</button>
-                 <button onclick="votar('${p}','no')">NO</button>`;
+  div.innerHTML=`
+    <h3>${p}</h3>
+    <button onclick="votar('${p}','si')">SI</button>
+    <button onclick="votar('${p}','no')">NO</button>
+  `;
   cont.appendChild(div);
 });
 
@@ -60,7 +68,7 @@ window.votar = async function(provincia, opcion){
   const votoRef = ref(db, 'votos/' + provincia);
   const snapshot = await get(votoRef);
   let datos = {si:0,no:0};
-  if(snapshot.exists()){ datos = snapshot.val(); }
+  if(snapshot.exists()) datos = snapshot.val();
   datos[opcion]++;
   set(votoRef, datos);
   alert("Voto registrado");
