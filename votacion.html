@@ -44,15 +44,11 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const db = getDatabase(app);
 const auth = getAuth(app);
-
 const userInfoSpan = document.getElementById("user-info");
 const logoutBtn = document.getElementById("logout-btn");
 
 window.cerrarSesion = function() {
-  signOut(auth).then(() => {
-    alert("Sesión cerrada");
-    window.location="index.html";
-  });
+  signOut(auth).then(() => { window.location="index.html"; });
 }
 
 onAuthStateChanged(auth, user => {
@@ -85,6 +81,5 @@ window.votar = async function(provincia, opcion){
   alert("Voto registrado");
 }
 </script>
-
 </body>
 </html>
