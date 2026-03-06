@@ -60,78 +60,93 @@ display:inline-block;
 <h2>Resultados</h2>
 <div id="resultados"></div>
 
-<script>
+<script type="module">
 
-const provincias=[
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import { getDatabase, ref, set, onValue, get } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyAcsuZ-oZCrQ81XNF-945h4d2msKtBN8uM",
+  authDomain: "votacion-diputados.firebaseapp.com",
+  databaseURL: "https://votacion-diputados-default-rtdb.firebaseio.com",
+  projectId: "votacion-diputados",
+  storageBucket: "votacion-diputados.firebasestorage.app",
+  messagingSenderId: "56652176884",
+  appId: "1:56652176884:web:2a50622dea3dc814a72da1",
+  measurementId: "G-0ZWXEEG719"
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getDatabase(app);
+
+const provincias = [
 "Azua","Baoruco","Barahona","Dajabón","Distrito Nacional","Duarte",
 "Elías Piña","El Seibo","Espaillat","Hato Mayor","Hermanas Mirabal",
 "Independencia","La Altagracia","La Romana","La Vega","María Trinidad Sánchez",
 "Monseñor Nouel","Monte Cristi","Monte Plata","Pedernales","Peravia",
 "Puerto Plata","Samaná","San Cristóbal","San José de Ocoa","San Juan",
 "San Pedro de Macorís","Sánchez Ramírez","Santiago","Santiago Rodríguez",
-"Santo Domingo","Valverde"
+"Valverde"
 ];
 
-let votos={};
+window.votar = async function(provincia, opcion){
 
-provincias.forEach(p=>{
-votos[p]={si:0,no:0};
-});
+const votoRef = ref(db, 'votos/' + provincia);
 
-function cargarProvincias(){
+const snapshot = await get(votoRef);
 
-let cont=document.getElementById("provincias");
+let datos = {si:0,no:0};
 
-provincias.forEach(p=>{
+if(snapshot.exists()){
+datos = snapshot.val();
+}
 
-let div=document.createElement("div");
-div.className="provincia";
+datos[opcion]++;
 
-div.innerHTML=`
-<h3>${p}</h3>
-<button class="si" onclick="votar('${p}','si')">SI</button>
-<button class="no" onclick="votar('${p}','no')">NO</button>
-`;
+set(votoRef, datos);
 
-cont.appendChild(div);
-
-});
+alert("Voto registrado");
 
 }
 
-function votar(prov,tipo){
+window.mostrarResultados = function(){
 
-votos[prov][tipo]++;
+const cont = document.getElementById("verResultados");
 
-mostrarResultados();
-
-}
-
-function mostrarResultados(){
-
-let cont=document.getElementById("resultados");
 cont.innerHTML="";
 
 provincias.forEach(p=>{
 
-let div=document.createElement("div");
+const votoRef = ref(db,'votos/'+p);
+
+onValue(votoRef,(snapshot)=>{
+
+let datos = snapshot.val() || {si:0,no:0};
+
+let div = document.getElementById("res_"+p);
+
+if(!div){
+
+div=document.createElement("div");
+
+div.id="res_"+p;
+
 div.className="provincia";
 
-div.innerHTML=`
+cont.appendChild(div);
+
+}
+
+div.innerHTML = `
 <h3>${p}</h3>
-SI: ${votos[p].si} <br>
-NO: ${votos[p].no}
+<p>SI: ${datos.si}</p>
+<p>NO: ${datos.no}</p>
 `;
 
-cont.appendChild(div);
+});
 
 });
 
 }
 
-cargarProvincias();
-
 </script>
-
-</body>
-</html>
