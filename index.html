@@ -3,208 +3,30 @@
 <head>
 <meta charset="UTF-8">
 <title>Aprobación de proyectos</title>
-
 <style>
-
-body{
-font-family: Arial;
-text-align:center;
-background:#f4f4f4;
-}
-
-nav{
-background:#002D62;
-padding:15px;
-}
-
-nav a{
-color:white;
-margin:10px;
-text-decoration:none;
-font-weight:bold;
-}
-
-section{
-margin:30px;
-}
-
-button{
-padding:10px 20px;
-margin:5px;
-font-size:16px;
-cursor:pointer;
-}
-
-.provincia{
-background:white;
-margin:10px;
-padding:10px;
-border-radius:8px;
-}
-
-img{
-width:300px;
-margin:10px;
-border-radius:10px;
-}
-
+body{font-family: Arial;text-align:center;background:#f4f4f4;}
+nav{background:#002D62;padding:15px;}
+nav a{color:white;margin:10px;text-decoration:none;font-weight:bold;}
+section{margin:30px;}
+img{width:300px;margin:10px;border-radius:10px;}
 </style>
 </head>
-
 <body>
 
+<!-- Menú -->
 <nav>
-<a href="#inicio">Inicio</a>
-<a href="#provincias">Provincias</a>
-<a href="#resultados">Ver votos</a>
+  <a href="index.html">Inicio</a>
+  <a href="votacion.html">Área de votación</a>
+  <a href="resultados.html">Ver votos</a>
 </nav>
 
-<section id="inicio">
-
+<!-- Sección Inicio -->
+<section>
 <h1>Aprobación de proyectos</h1>
 <h2>Sistema de votación</h2>
-
 <img src="https://tse4.mm.bing.net/th/id/OIP.1sPFPR1HWOUNZR8SWlwDlgHaDF?rs=1&pid=ImgDetMain&o=7&rm=3">
-
 <p>Votación por provincias de la República Dominicana</p>
-
 </section>
-
-<section id="provincias">
-
-<h2>Provincias de República Dominicana</h2>
-
-<div id="listaProvincias"></div>
-
-</section>
-
-<section id="resultados">
-
-<h2>Resultados</h2>
-
-<button onclick="mostrarResultados()">Actualizar resultados</button>
-<button onclick="borrarResultados()">Borrar resultados</button>
-
-<div id="verResultados"></div>
-
-</section>
-
-<script type="module">
-
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-import { getDatabase, ref, set, onValue, get, remove } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
-
-  window.borrarResultados = function(){
-
-if(confirm("¿Seguro que quieres borrar todos los votos?")){
-
-const votosRef = ref(db,"votos");
-
-remove(votosRef);
-
-alert("Todos los votos fueron borrados");
-
-}
-
-}
-
-const firebaseConfig = {
-apiKey: "AIzaSyAcsuZ-oZCrQ81XNF-945h4d2msKtBN8uM",
-authDomain: "votacion-diputados.firebaseapp.com",
-databaseURL: "https://votacion-diputados-default-rtdb.firebaseio.com",
-projectId: "votacion-diputados",
-storageBucket: "votacion-diputados.firebasestorage.app",
-messagingSenderId: "56652176884",
-appId: "1:56652176884:web:2a50622dea3dc814a72da1"
-};
-
-const app = initializeApp(firebaseConfig);
-const db = getDatabase(app);
-
-const provincias = [
-"La Vega","Puerto Plata","San Cristóbal","San Juan",
-"Santiago", "Santo Domingo Este",
-];
-
-const cont = document.getElementById("listaProvincias");
-
-provincias.forEach(p=>{
-
-const div=document.createElement("div");
-
-div.className="provincia";
-
-div.innerHTML=`
-<h3>${p}</h3>
-<button onclick="votar('${p}','si')">SI</button>
-<button onclick="votar('${p}','no')">NO</button>
-`;
-
-cont.appendChild(div);
-
-});
-
-window.votar = async function(provincia, opcion){
-
-const votoRef = ref(db, 'votos/' + provincia);
-
-const snapshot = await get(votoRef);
-
-let datos = {si:0,no:0};
-
-if(snapshot.exists()){
-datos = snapshot.val();
-}
-
-datos[opcion]++;
-
-set(votoRef, datos);
-
-alert("Voto registrado");
-
-}
-
-window.mostrarResultados = function(){
-
-const cont = document.getElementById("verResultados");
-
-cont.innerHTML="";
-
-provincias.forEach(p=>{
-
-const votoRef = ref(db,'votos/'+p);
-
-onValue(votoRef,(snapshot)=>{
-
-let datos = snapshot.val() || {si:0,no:0};
-
-let div = document.getElementById("res_"+p);
-
-if(!div){
-
-div=document.createElement("div");
-
-div.id="res_"+p;
-
-div.className="provincia";
-
-cont.appendChild(div);
-
-}
-
-div.innerHTML=`
-<h3>${p}</h3>
-<p>SI: ${datos.si}</p>
-<p>NO: ${datos.no}</p>
-`;
-
-});
-
-});
-
-}
-
-</script>
 
 </body>
 </html>
