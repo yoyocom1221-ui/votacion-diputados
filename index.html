@@ -4,11 +4,12 @@
 <meta charset="UTF-8">
 <title>Inicio - Aprobación de proyectos</title>
 <style>
-body{font-family: Arial; text-align:center; background:#f4f4f4; margin:0; padding:0;}
-nav{background:#002D62; padding:15px;}
-nav a{color:white; margin:10px; text-decoration:none; font-weight:bold;}
-h1.big-title{font-size:48px; color:#002D62;}
-button{padding:10px 20px; margin:5px; font-size:16px; cursor:pointer;}
+body{font-family: Arial;text-align:center;background:#f4f4f4;margin:0;padding:0;}
+nav{background:#002D62;padding:15px;display:flex;justify-content:center;align-items:center;}
+nav a{color:white;margin:10px;text-decoration:none;font-weight:bold;}
+nav #user-info{color:white;margin-left:20px;font-weight:bold;}
+h1.big-title{font-size:48px;color:#002D62;}
+button{padding:10px 20px;margin:5px;font-size:16px;cursor:pointer;}
 </style>
 </head>
 <body>
@@ -17,6 +18,8 @@ button{padding:10px 20px; margin:5px; font-size:16px; cursor:pointer;}
 <a href="index.html">Inicio</a>
 <a href="votacion.html">Votación</a>
 <a href="ver_votos.html">Ver votos</a>
+<span id="user-info"></span>
+<button id="logout-btn" style="display:none;" onclick="cerrarSesion()">Cerrar sesión</button>
 </nav>
 
 <section>
@@ -29,10 +32,9 @@ button{padding:10px 20px; margin:5px; font-size:16px; cursor:pointer;}
 
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-import { getAuth, signInWithPopup, GoogleAuthProvider, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+import { getAuth, signInWithPopup, GoogleAuthProvider, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 import { getDatabase, ref, set } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
 
-// Firebase Config
 const firebaseConfig = {
   apiKey: "AIzaSyAcsuZ-oZCrQ81XNF-945h4d2msKtBN8uM",
   authDomain: "votacion-diputados.firebaseapp.com",
@@ -49,20 +51,34 @@ const auth = getAuth(app);
 const db = getDatabase(app);
 const provider = new GoogleAuthProvider();
 
-function iniciarSesionGoogle() {
+const userInfoSpan = document.getElementById("user-info");
+const logoutBtn = document.getElementById("logout-btn");
+
+window.iniciarSesionGoogle = function() {
   signInWithPopup(auth, provider)
-    .then((result) => {
+    .then(result => {
       const user = result.user;
       alert("¡Bienvenido, " + user.displayName + "!");
-      set(ref(db, 'usuarios/' + user.uid), {nombre:user.displayName, email:user.email});
+      set(ref(db, 'usuarios/' + user.uid), {nombre: user.displayName, email: user.email});
+      userInfoSpan.textContent = user.displayName;
+      logoutBtn.style.display = "inline-block";
+      window.location = "votacion.html";
     })
-    .catch((error) => {console.error(error); alert(error.message);});
+    .catch(error => {console.error(error); alert("Error: "+error.message);});
 }
 
-// Redirigir si ya está logueado
-onAuthStateChanged(auth, (user) => {
+window.cerrarSesion = function() {
+  signOut(auth).then(() => {
+    alert("Sesión cerrada");
+    userInfoSpan.textContent = "";
+    logoutBtn.style.display = "none";
+  });
+}
+
+onAuthStateChanged(auth, user => {
   if(user){
-    console.log("Usuario logueado:", user.displayName);
+    userInfoSpan.textContent = user.displayName;
+    logoutBtn.style.display = "inline-block";
   }
 });
 </script>
