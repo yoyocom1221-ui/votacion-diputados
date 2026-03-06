@@ -1,46 +1,51 @@
 <!DOCTYPE html>
-<html>
+<html lang="es">
 <head>
+<meta charset="UTF-8">
 <title>Aprobación de proyectos</title>
+
 <style>
 
 body{
 font-family: Arial;
-background:#f2f2f2;
 text-align:center;
+background:#f4f4f4;
 }
 
-header{
+nav{
 background:#002D62;
+padding:15px;
+}
+
+nav a{
 color:white;
-padding:20px;
+margin:10px;
+text-decoration:none;
+font-weight:bold;
+}
+
+section{
+margin:30px;
 }
 
 button{
 padding:10px 20px;
-margin:10px;
-font-size:18px;
+margin:5px;
+font-size:16px;
 cursor:pointer;
-border-radius:6px;
-border:none;
-}
-
-.si{
-background:green;
-color:white;
-}
-
-.no{
-background:red;
-color:white;
 }
 
 .provincia{
 background:white;
-padding:15px;
+margin:10px;
+padding:10px;
+border-radius:8px;
+}
+
+img{
+width:300px;
 margin:10px;
 border-radius:10px;
-display:inline-block;
 }
 
 </style>
@@ -48,59 +53,55 @@ display:inline-block;
 
 <body>
 
-  <nav>
-  <a href="#inicio">Inicio</a> |
-  <a href="#provincias">Provincias de República Dominicana</a> |
-  <a href="#resultados">Resultados</a>
+<nav>
+<a href="#inicio">Inicio</a>
+<a href="#provincias">Provincias</a>
+<a href="#resultados">Ver votos</a>
 </nav>
 
 <section id="inicio">
-  <h1>Aprobación de proyectos</h1>
-  <p>Sistema de votación</p>
+
+<h1>Aprobación de proyectos</h1>
+<h2>Sistema de votación</h2>
+
+<img src="https://upload.wikimedia.org/wikipedia/commons/9/9f/Camara_de_Diputados_RD.jpg">
+<img src="https://upload.wikimedia.org/wikipedia/commons/2/21/Flag_of_the_Dominican_Republic.svg">
+
+<p>Votación por provincias de la República Dominicana</p>
+
 </section>
 
 <section id="provincias">
-  <h2>Provincias</h2>
 
-  <button onclick="votar('Santo Domingo','si')">Santo Domingo - SI</button>
-  <button onclick="votar('Santo Domingo','no')">Santo Domingo - NO</button>
+<h2>Provincias de República Dominicana</h2>
 
-  <button onclick="votar('Santiago','si')">Santiago - SI</button>
-  <button onclick="votar('Santiago','no')">Santiago - NO</button>
+<div id="listaProvincias"></div>
 
 </section>
 
 <section id="resultados">
-  <h2>Resultados</h2>
-  <button onclick="mostrarResultados()">Ver votos</button>
-  <div id="verResultados"></div>
-</section>
-  
-<header>
-<h1>Aprobación de proyectos</h1>
-<h3>Sistema de votación</h3>
-</header>
-
-<h2>Provincias de República Dominicana</h2>
-
-<div id="provincias"></div>
 
 <h2>Resultados</h2>
-<div id="resultados"></div>
+
+<button onclick="mostrarResultados()">Actualizar resultados</button>
+
+<div id="verResultados"></div>
+
+</section>
+
 <script type="module">
 
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
 import { getDatabase, ref, set, onValue, get } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
 
 const firebaseConfig = {
-  apiKey: "AIzaSyAcsuZ-oZCrQ81XNF-945h4d2msKtBN8uM",
-  authDomain: "votacion-diputados.firebaseapp.com",
-  databaseURL: "https://votacion-diputados-default-rtdb.firebaseio.com",
-  projectId: "votacion-diputados",
-  storageBucket: "votacion-diputados.firebasestorage.app",
-  messagingSenderId: "56652176884",
-  appId: "1:56652176884:web:2a50622dea3dc814a72da1",
-  measurementId: "G-0ZWXEEG719"
+apiKey: "AIzaSyAcsuZ-oZCrQ81XNF-945h4d2msKtBN8uM",
+authDomain: "votacion-diputados.firebaseapp.com",
+databaseURL: "https://votacion-diputados-default-rtdb.firebaseio.com",
+projectId: "votacion-diputados",
+storageBucket: "votacion-diputados.firebasestorage.app",
+messagingSenderId: "56652176884",
+appId: "1:56652176884:web:2a50622dea3dc814a72da1"
 };
 
 const app = initializeApp(firebaseConfig);
@@ -115,6 +116,24 @@ const provincias = [
 "San Pedro de Macorís","Sánchez Ramírez","Santiago","Santiago Rodríguez",
 "Valverde"
 ];
+
+const cont = document.getElementById("listaProvincias");
+
+provincias.forEach(p=>{
+
+const div=document.createElement("div");
+
+div.className="provincia";
+
+div.innerHTML=`
+<h3>${p}</h3>
+<button onclick="votar('${p}','si')">SI</button>
+<button onclick="votar('${p}','no')">NO</button>
+`;
+
+cont.appendChild(div);
+
+});
 
 window.votar = async function(provincia, opcion){
 
@@ -164,7 +183,7 @@ cont.appendChild(div);
 
 }
 
-div.innerHTML = `
+div.innerHTML=`
 <h3>${p}</h3>
 <p>SI: ${datos.si}</p>
 <p>NO: ${datos.no}</p>
@@ -177,3 +196,6 @@ div.innerHTML = `
 }
 
 </script>
+
+</body>
+</html>
