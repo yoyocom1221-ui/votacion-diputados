@@ -27,12 +27,13 @@ button{padding:10px 20px;margin:5px;font-size:16px;cursor:pointer;}
 <h2>Sistema de votación</h2>
 <img src="https://tse4.mm.bing.net/th/id/OIP.1sPFPR1HWOUNZR8SWlwDlgHaDF?rs=1&pid=ImgDetMain&o=7&rm=3" width="300">
 <p>Votación por provincias de la República Dominicana</p>
-<button onclick="iniciarSesionGoogle()">Iniciar sesión con Google</button>
+<button id="login-btn">Iniciar sesión con Google</button>
 </section>
 
+<script src="https://accounts.google.com/gsi/client" async defer></script>
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-import { getAuth, signInWithPopup, GoogleAuthProvider, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+import { getAuth, GoogleAuthProvider, signInWithPopup, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 import { getDatabase, ref, set } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
 
 const firebaseConfig = {
@@ -53,8 +54,9 @@ const provider = new GoogleAuthProvider();
 
 const userInfoSpan = document.getElementById("user-info");
 const logoutBtn = document.getElementById("logout-btn");
+const loginBtn = document.getElementById("login-btn");
 
-window.iniciarSesionGoogle = function() {
+loginBtn.onclick = function() {
   signInWithPopup(auth, provider)
     .then(result => {
       const user = result.user;
@@ -62,16 +64,18 @@ window.iniciarSesionGoogle = function() {
       set(ref(db, 'usuarios/' + user.uid), {nombre: user.displayName, email: user.email});
       userInfoSpan.textContent = user.displayName;
       logoutBtn.style.display = "inline-block";
+      loginBtn.style.display = "none";
       window.location = "votacion.html";
     })
     .catch(error => {console.error(error); alert("Error: "+error.message);});
 }
 
-window.cerrarSesion = function() {
+logoutBtn.onclick = function() {
   signOut(auth).then(() => {
     alert("Sesión cerrada");
     userInfoSpan.textContent = "";
     logoutBtn.style.display = "none";
+    loginBtn.style.display = "inline-block";
   });
 }
 
@@ -79,9 +83,9 @@ onAuthStateChanged(auth, user => {
   if(user){
     userInfoSpan.textContent = user.displayName;
     logoutBtn.style.display = "inline-block";
+    loginBtn.style.display = "none";
   }
 });
 </script>
-
 </body>
 </html>
