@@ -93,7 +93,21 @@ border-radius:10px;
 <script type="module">
 
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-import { getDatabase, ref, set, onValue, get } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
+import { getDatabase, ref, set, onValue, get, remove } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
+
+  window.borrarResultados = function(){
+
+if(confirm("¿Seguro que quieres borrar todos los votos?")){
+
+const votosRef = ref(db,"votos");
+
+remove(votosRef);
+
+alert("Todos los votos fueron borrados");
+
+}
+
+}
 
 const firebaseConfig = {
 apiKey: "AIzaSyAcsuZ-oZCrQ81XNF-945h4d2msKtBN8uM",
