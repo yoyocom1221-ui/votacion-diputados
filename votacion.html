@@ -4,11 +4,12 @@
 <meta charset="UTF-8">
 <title>Votación - Aprobación de proyectos</title>
 <style>
-body{font-family: Arial; text-align:center; background:#f4f4f4; margin:0; padding:0;}
-nav{background:#002D62; padding:15px;}
-nav a{color:white; margin:10px; text-decoration:none; font-weight:bold;}
-button{padding:10px 20px; margin:5px; font-size:16px; cursor:pointer;}
-.provincia{background:white; margin:10px; padding:10px; border-radius:8px;}
+body{font-family: Arial;text-align:center;background:#f4f4f4;margin:0;padding:0;}
+nav{background:#002D62;padding:15px;display:flex;justify-content:center;align-items:center;}
+nav a{color:white;margin:10px;text-decoration:none;font-weight:bold;}
+nav #user-info{color:white;margin-left:20px;font-weight:bold;}
+button{padding:10px 20px;margin:5px;font-size:16px;cursor:pointer;}
+.provincia{background:white;margin:10px;padding:10px;border-radius:8px;}
 </style>
 </head>
 <body>
@@ -17,6 +18,8 @@ button{padding:10px 20px; margin:5px; font-size:16px; cursor:pointer;}
 <a href="index.html">Inicio</a>
 <a href="votacion.html">Votación</a>
 <a href="ver_votos.html">Ver votos</a>
+<span id="user-info"></span>
+<button id="logout-btn" style="display:none;" onclick="cerrarSesion()">Cerrar sesión</button>
 </nav>
 
 <h2>Provincias de República Dominicana</h2>
@@ -25,9 +28,8 @@ button{padding:10px 20px; margin:5px; font-size:16px; cursor:pointer;}
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
 import { getDatabase, ref, set, get } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
-import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+import { getAuth, onAuthStateChanged, signOut, GoogleAuthProvider } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 
-// Firebase Config
 const firebaseConfig = {
   apiKey: "AIzaSyAcsuZ-oZCrQ81XNF-945h4d2msKtBN8uM",
   authDomain: "votacion-diputados.firebaseapp.com",
@@ -43,20 +45,33 @@ const app = initializeApp(firebaseConfig);
 const db = getDatabase(app);
 const auth = getAuth(app);
 
-// Verificar que esté logueado
-onAuthStateChanged(auth, (user)=>{
-  if(!user){alert("Debes iniciar sesión primero."); window.location="index.html";}
+const userInfoSpan = document.getElementById("user-info");
+const logoutBtn = document.getElementById("logout-btn");
+
+window.cerrarSesion = function() {
+  signOut(auth).then(() => {
+    alert("Sesión cerrada");
+    window.location="index.html";
+  });
+}
+
+onAuthStateChanged(auth, user => {
+  if(!user){ alert("Debes iniciar sesión primero."); window.location="index.html"; }
+  else{
+    userInfoSpan.textContent = user.displayName;
+    logoutBtn.style.display = "inline-block";
+  }
 });
 
 const provincias = ["La Vega","Puerto Plata","San Cristóbal","San Juan","Santiago","Santo Domingo Este"];
 const cont = document.getElementById("listaProvincias");
 
-provincias.forEach(p=>{
-  const div=document.createElement("div");
-  div.className="provincia";
-  div.innerHTML=`<h3>${p}</h3>
-                 <button onclick="votar('${p}','si')">SI</button>
-                 <button onclick="votar('${p}','no')">NO</button>`;
+provincias.forEach(p => {
+  const div = document.createElement("div");
+  div.className = "provincia";
+  div.innerHTML = `<h3>${p}</h3>
+                   <button onclick="votar('${p}','si')">SI</button>
+                   <button onclick="votar('${p}','no')">NO</button>`;
   cont.appendChild(div);
 });
 
@@ -68,7 +83,7 @@ window.votar = async function(provincia, opcion){
   datos[opcion]++;
   set(votoRef, datos);
   alert("Voto registrado");
-};
+}
 </script>
 
 </body>
