@@ -1,3 +1,4 @@
+```html
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -46,7 +47,7 @@ apiKey: "AIzaSyAcsuZ-oZCrQ81XNF-945h4d2msKtBN8uM",
 authDomain: "votacion-diputados.firebaseapp.com",
 databaseURL: "https://votacion-diputados-default-rtdb.firebaseio.com",
 projectId: "votacion-diputados",
-storageBucket: "votacion-diputados.firebasestorage.app",
+storageBucket: "votacion-diputados.appspot.com",
 messagingSenderId: "56652176884",
 appId: "1:56652176884:web:2a50622dea3dc814a72da1"
 };
@@ -63,6 +64,11 @@ onValue(votosRef,(snapshot)=>{
 cont.innerHTML="";
 
 const datos=snapshot.val();
+
+if(!datos){
+cont.innerHTML="No hay votos aún";
+return;
+}
 
 for(const provincia in datos){
 
@@ -85,9 +91,7 @@ cont.appendChild(div);
 window.borrarResultados=function(){
 
 if(confirm("¿Borrar todos los votos?")){
-
 remove(votosRef);
-
 }
 
 }
@@ -96,3 +100,4 @@ remove(votosRef);
 
 </body>
 </html>
+```
