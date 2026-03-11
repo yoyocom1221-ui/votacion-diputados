@@ -5,60 +5,48 @@
 <title>Resultados</title>
 
 <style>
+
 body{
-font-family:Arial;
+font-family: Arial;
 text-align:center;
-background:#f4f4f4;
-margin:0;
-}
-
-nav{
-background:#002D62;
-padding:15px;
-}
-
-nav a{
-color:white;
-margin:10px;
-text-decoration:none;
-font-weight:bold;
+background:#f2f2f2;
 }
 
 .provincia{
 background:white;
-margin:10px auto;
+margin:10px;
 padding:10px;
 border-radius:8px;
-width:300px;
 }
+
+button{
+padding:10px;
+margin:10px;
+}
+
 </style>
+
 </head>
 
 <body>
 
-<nav>
-<a href="index.html">Inicio</a>
-<a href="votacion.html">Votación</a>
-<a href="resultados.html">Ver votos</a>
-</nav>
+<h1>Resultados</h1>
 
-<h2>Resultados de la votación</h2>
-
-<button onclick="cargarResultados()">Actualizar resultados</button>
+<button onclick="borrarResultados()">Borrar resultados</button>
 
 <div id="resultados"></div>
 
 <script type="module">
 
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-import { getDatabase, ref, get } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
+import { getDatabase, ref, onValue, remove } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
 
 const firebaseConfig = {
 apiKey: "AIzaSyAcsuZ-oZCrQ81XNF-945h4d2msKtBN8uM",
 authDomain: "votacion-diputados.firebaseapp.com",
 databaseURL: "https://votacion-diputados-default-rtdb.firebaseio.com",
 projectId: "votacion-diputados",
-storageBucket: "votacion-diputados.appspot.com",
+storageBucket: "votacion-diputados.firebasestorage.app",
 messagingSenderId: "56652176884",
 appId: "1:56652176884:web:2a50622dea3dc814a72da1"
 };
@@ -66,39 +54,39 @@ appId: "1:56652176884:web:2a50622dea3dc814a72da1"
 const app = initializeApp(firebaseConfig);
 const db = getDatabase(app);
 
-window.cargarResultados = async function(){
-
 const cont=document.getElementById("resultados");
-cont.innerHTML="Cargando...";
 
-const votosRef=ref(db,'votos');
+const votosRef=ref(db,"votos");
 
-const snapshot=await get(votosRef);
+onValue(votosRef,(snapshot)=>{
 
 cont.innerHTML="";
-
-if(!snapshot.exists()){
-cont.innerHTML="No hay votos registrados";
-return;
-}
 
 const datos=snapshot.val();
 
 for(const provincia in datos){
 
-const si=datos[provincia].si || 0;
-const no=datos[provincia].no || 0;
-
 const div=document.createElement("div");
+
 div.className="provincia";
 
 div.innerHTML=`
 <h3>${provincia}</h3>
-<p>SI: ${si}</p>
-<p>NO: ${no}</p>
+<p>SI: ${datos[provincia].si}</p>
+<p>NO: ${datos[provincia].no}</p>
 `;
 
 cont.appendChild(div);
+
+}
+
+});
+
+window.borrarResultados=function(){
+
+if(confirm("¿Borrar todos los votos?")){
+
+remove(votosRef);
 
 }
 
