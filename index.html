@@ -1,3 +1,4 @@
+```html
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -30,6 +31,12 @@ margin:10px;
 border-radius:10px;
 }
 
+button{
+padding:12px;
+margin:10px;
+font-size:16px;
+}
+
 </style>
 
 </head>
@@ -50,5 +57,41 @@ border-radius:10px;
 
 <p>Votación por provincias de la República Dominicana</p>
 
+<button onclick="loginGoogle()">Iniciar sesión con Google</button>
+
+<script type="module">
+
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import { getAuth, GoogleAuthProvider, signInWithPopup } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+
+const firebaseConfig = {
+apiKey: "AIzaSyAcsuZ-oZCrQ81XNF-945h4d2msKtBN8uM",
+authDomain: "votacion-diputados.firebaseapp.com",
+databaseURL: "https://votacion-diputados-default-rtdb.firebaseio.com",
+projectId: "votacion-diputados",
+storageBucket: "votacion-diputados.appspot.com",
+messagingSenderId: "56652176884",
+appId: "1:56652176884:web:2a50622dea3dc814a72da1"
+};
+
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const provider = new GoogleAuthProvider();
+
+window.loginGoogle = function(){
+
+signInWithPopup(auth,provider)
+.then(()=>{
+window.location="provincias.html";
+})
+.catch((error)=>{
+alert(error.message);
+});
+
+}
+
+</script>
+
 </body>
 </html>
+```
