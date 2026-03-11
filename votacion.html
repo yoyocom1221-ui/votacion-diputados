@@ -1,3 +1,4 @@
+```html
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -38,19 +39,28 @@ margin:5px;
 
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
 import { getDatabase, ref, set, get } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
+import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 
 const firebaseConfig = {
 apiKey: "AIzaSyAcsuZ-oZCrQ81XNF-945h4d2msKtBN8uM",
 authDomain: "votacion-diputados.firebaseapp.com",
 databaseURL: "https://votacion-diputados-default-rtdb.firebaseio.com",
 projectId: "votacion-diputados",
-storageBucket: "votacion-diputados.firebasestorage.app",
+storageBucket: "votacion-diputados.appspot.com",
 messagingSenderId: "56652176884",
 appId: "1:56652176884:web:2a50622dea3dc814a72da1"
 };
 
 const app = initializeApp(firebaseConfig);
 const db = getDatabase(app);
+const auth = getAuth(app);
+
+onAuthStateChanged(auth,user=>{
+if(!user){
+alert("Debes iniciar sesión");
+window.location="index.html";
+}
+});
 
 const provincias = [
 "Azua","Baoruco","Barahona","Dajabón","Distrito Nacional","Duarte",
@@ -104,3 +114,4 @@ alert("Voto registrado");
 
 </body>
 </html>
+```
