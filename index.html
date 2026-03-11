@@ -2,62 +2,53 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8">
-<title>Inicio - Votación</title>
+<title>Aprobación de proyectos</title>
 
 <style>
+
 body{
-font-family:Arial;
+font-family: Arial;
 text-align:center;
-background:#f4f4f4;
-margin-top:100px;
+background:#f2f2f2;
 }
 
-button{
-padding:15px 30px;
-font-size:18px;
-cursor:pointer;
+nav{
+background:#002D62;
+padding:15px;
 }
+
+nav a{
+color:white;
+margin:10px;
+text-decoration:none;
+font-weight:bold;
+}
+
+img{
+width:300px;
+margin:10px;
+border-radius:10px;
+}
+
 </style>
+
 </head>
 
 <body>
 
-<h1>Sistema de Votación</h1>
+<nav>
+<a href="index.html">Inicio</a>
+<a href="provincias.html">Provincias</a>
+<a href="resultados.html">Ver votos</a>
+</nav>
 
-<button onclick="loginGoogle()">Iniciar sesión con Google</button>
+<h1>Aprobación de proyectos</h1>
 
-<script type="module">
+<h2>Sistema de votación</h2>
 
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-import { getAuth, GoogleAuthProvider, signInWithPopup } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+<img src="https://upload.wikimedia.org/wikipedia/commons/2/21/Flag_of_the_Dominican_Republic.svg">
 
-const firebaseConfig = {
-apiKey: "AIzaSyAcsuZ-oZCrQ81XNF-945h4d2msKtBN8uM",
-authDomain: "votacion-diputados.firebaseapp.com",
-databaseURL: "https://votacion-diputados-default-rtdb.firebaseio.com",
-projectId: "votacion-diputados",
-storageBucket: "votacion-diputados.appspot.com",
-messagingSenderId: "56652176884",
-appId: "1:56652176884:web:2a50622dea3dc814a72da1"
-};
-
-const app = initializeApp(firebaseConfig);
-const auth = getAuth(app);
-const provider = new GoogleAuthProvider();
-
-window.loginGoogle = function(){
-
-signInWithPopup(auth,provider)
-.then(()=>{
-window.location="votacion.html";
-})
-.catch((error)=>{
-alert(error.message);
-});
-
-}
-
-</script>
+<p>Votación por provincias de la República Dominicana</p>
 
 </body>
 </html>
