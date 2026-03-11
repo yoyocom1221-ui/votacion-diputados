@@ -2,23 +2,19 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8">
-<title>Votación - Aprobación de proyectos</title>
+<title>Resultados</title>
 
 <style>
 body{
-font-family: Arial;
+font-family:Arial;
 text-align:center;
 background:#f4f4f4;
 margin:0;
-padding:0;
 }
 
 nav{
 background:#002D62;
 padding:15px;
-display:flex;
-justify-content:center;
-align-items:center;
 }
 
 nav a{
@@ -28,24 +24,12 @@ text-decoration:none;
 font-weight:bold;
 }
 
-nav #user-info{
-color:white;
-margin-left:20px;
-font-weight:bold;
-}
-
-button{
-padding:10px 20px;
-margin:5px;
-font-size:16px;
-cursor:pointer;
-}
-
 .provincia{
 background:white;
-margin:10px;
+margin:10px auto;
 padding:10px;
 border-radius:8px;
+width:300px;
 }
 </style>
 </head>
@@ -55,24 +39,22 @@ border-radius:8px;
 <nav>
 <a href="index.html">Inicio</a>
 <a href="votacion.html">Votación</a>
-<a href="ver_votos.html">Ver votos</a>
-
-<span id="user-info"></span>
-<button id="logout-btn" style="display:none;" onclick="cerrarSesion()">Cerrar sesión</button>
+<a href="resultados.html">Ver votos</a>
 </nav>
 
-<h2>Provincias de República Dominicana</h2>
+<h2>Resultados de la votación</h2>
 
-<div id="listaProvincias"></div>
+<button onclick="cargarResultados()">Actualizar resultados</button>
+
+<div id="resultados"></div>
 
 <script type="module">
 
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-import { getDatabase, ref, set, get } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
-import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+import { getDatabase, ref, get } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
 
 const firebaseConfig = {
-apiKey: "TU_API_KEY",
+apiKey: "AIzaSyAcsuZ-oZCrQ81XNF-945h4d2msKtBN8uM",
 authDomain: "votacion-diputados.firebaseapp.com",
 databaseURL: "https://votacion-diputados-default-rtdb.firebaseio.com",
 projectId: "votacion-diputados",
@@ -83,76 +65,44 @@ appId: "1:56652176884:web:2a50622dea3dc814a72da1"
 
 const app = initializeApp(firebaseConfig);
 const db = getDatabase(app);
-const auth = getAuth(app);
 
-const userInfoSpan = document.getElementById("user-info");
-const logoutBtn = document.getElementById("logout-btn");
+window.cargarResultados = async function(){
 
-window.cerrarSesion = function(){
-signOut(auth).then(()=>{
-window.location="index.html";
-});
-};
+const cont=document.getElementById("resultados");
+cont.innerHTML="Cargando...";
 
-onAuthStateChanged(auth, user => {
+const votosRef=ref(db,'votos');
 
-if(!user){
-alert("Debes iniciar sesión primero");
-window.location="index.html";
-}
-else{
-userInfoSpan.textContent = user.displayName;
-logoutBtn.style.display="inline-block";
+const snapshot=await get(votosRef);
+
+cont.innerHTML="";
+
+if(!snapshot.exists()){
+cont.innerHTML="No hay votos registrados";
+return;
 }
 
-});
+const datos=snapshot.val();
 
-const provincias = [
-"La Vega",
-"Puerto Plata",
-"San Cristóbal",
-"San Juan",
-"Santiago",
-"Santo Domingo Este"
-];
+for(const provincia in datos){
 
-const cont = document.getElementById("listaProvincias");
+const si=datos[provincia].si || 0;
+const no=datos[provincia].no || 0;
 
-provincias.forEach(p =>{
-
-const div = document.createElement("div");
+const div=document.createElement("div");
 div.className="provincia";
 
 div.innerHTML=`
-<h3>${p}</h3>
-
-<button onclick="votar('${p}','si')">SI</button>
-<button onclick="votar('${p}','no')">NO</button>
+<h3>${provincia}</h3>
+<p>SI: ${si}</p>
+<p>NO: ${no}</p>
 `;
 
 cont.appendChild(div);
 
-});
-
-window.votar = async function(provincia, opcion){
-
-const votoRef = ref(db, 'votos/' + provincia);
-
-const snapshot = await get(votoRef);
-
-let datos = {si:0,no:0};
-
-if(snapshot.exists()){
-datos = snapshot.val();
 }
 
-datos[opcion]++;
-
-await set(votoRef, datos);
-
-alert("Voto registrado correctamente");
-
-};
+}
 
 </script>
 
